@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OWASP Top 10 Web Security</title>
+  <style>
+    /* General body styles */
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #f0f2f5, #e4e8eb);
+      color: #333;
+      min-height: 100vh;
+      position: relative;
+      padding-bottom: 60px;
+    }
+    
+    /* Header styles */
+    header {
+      background: linear-gradient(135deg, #2b2d42, #1a1a2e);
+      color: white;
+      padding: 30px 0;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba(82,174,227,0.1), rgba(43,45,66,0.1));
+      z-index: 1;
+    }
+
+    header h1 {
+      position: relative;
+      z-index: 2;
+      font-size: 2.5em;
+      margin: 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      animation: fadeInDown 1s ease;
+    }
+    
+    /* Navigation bar */
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 20px;
+      background: rgba(26,26,46,0.95);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    nav a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #52aee3, #2b2d42);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+    
+    nav a:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(82,174,227,0.3);
+    }
+    
+    nav a:hover::before {
+      opacity: 1;
+    }
+
+    /* Section styles */
+    section {
+      padding: 80px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .section-title {
+      text-align: center;
+      color: #2b2d42;
+      margin-bottom: 50px;
+      font-size: 2.8em;
+      position: relative;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, #52aee3, #2b2d42);
+      margin: 15px auto;
+      border-radius: 2px;
+      box-shadow: 0 2px 5px rgba(82,174,227,0.3);
+    }
+    
+    /* Intro paragraph section */
+    .intro {
+      padding: 50px;
+      text-align: center;
+      background: linear-gradient(135deg, #8d99ae, #52aee3);
+      color: white;
+      margin-bottom: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .intro::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/></svg>') center/cover;
+      opacity: 0.1;
+    }
+    
+    /* Grid container for OWASP boxes */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      padding: 40px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    
+    /* Individual vulnerability box */
+    .vuln-box {
+      background: linear-gradient(135deg, #ffffff, #f0f2f5);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(82,174,227,0.1);
+    }
+    
+    .vuln-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #52aee3, #2b2d42);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+    }
+    
+    .vuln-box:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .vuln-box:hover::before {
+      opacity: 0.1;
+    }
+    
+    .vuln-box span {
+      position: relative;
+      z-index: 2;
+      font-size: 1.2em;
+      color: #2b2d42;
+      transition: color 0.3s ease;
+    }
+
+    .vuln-box:hover span {
+      color: #52aee3;
+    }
+
+    /* Modal (popup) styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.8);
+      animation: fadeIn 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, #ffffff, #f0f2f5);
+      margin: 10% auto;
+      padding: 40px;
+      border-radius: 20px;
+      width: 80%;
+      max-width: 700px;
+      position: relative;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+      animation: slideIn 0.4s ease;
+      border: 1px solid rgba(82,174,227,0.2);
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .close-btn {
+      color: #666;
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      font-size: 32px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .close-btn:hover {
+      color: #333;
+      transform: rotate(90deg);
+      background: rgba(0,0,0,0.05);
+    }
+
+    .hint-button {
+      background: linear-gradient(135deg, #52aee3, #2b2d42);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-top: 25px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(82,174,227,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hint-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, rgba(255,255,255,0.2), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .hint-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(82,174,227,0.4);
+    }
+
+    .hint-button:hover::before {
+      transform: translateX(100%);
+    }
+    
+    .vulnerability-details {
+      margin-top: 25px;
+      padding: 20px;
+      background-color: rgba(255,255,255,0.9);
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      border: 1px solid rgba(82,174,227,0.1);
+    }
+
+    .vulnerability-details h3 {
+      color: #2b2d42;
+      margin-top: 0;
+      font-size: 1.5em;
+    }
+
+    .vulnerability-details p {
+      line-height: 1.8;
+      color: #333;
+      font-size: 1.1em;
+    }
+
+    .answer-content {
+      background-color: #f8f9fa;
+      padding: 25px;
+      border-radius: 15px;
+      margin-top: 25px;
+      border-left: 4px solid #52aee3;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .answer-content h3 {
+      color: #2b2d42;
+      margin-top: 0;
+      font-size: 1.5em;
+    }
+
+    .answer-content p {
+      color: #333;
+      line-height: 1.8;
+      font-size: 1.1em;
+    }
+
+    /* About Section */
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .about-image {
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .about-image:hover {
+      transform: scale(1.02);
+    }
+
+    .about-text {
+      font-size: 1.2em;
+      line-height: 1.8;
+    }
+
+    /* Services Section */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+    }
+
+    .service-card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: all 0.4s ease;
+      border: 1px solid rgba(82,174,227,0.1);
+    }
+
+    .service-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+
+    .service-icon {
+      font-size: 3em;
+      color: #52aee3;
+      margin-bottom: 25px;
+      text-shadow: 2px 2px 4px rgba(82,174,227,0.2);
+    }
+
+    /* Contact Section */
+    .contact-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+    }
+
+    .contact-form {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border: 1px solid rgba(82,174,227,0.1);
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #2b2d42;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 1.1em;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: #52aee3;
+      box-shadow: 0 0 0 3px rgba(82,174,227,0.1);
+      outline: none;
+    }
+
+    .form-group textarea {
+      height: 150px;
+      resize: vertical;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, #52aee3, #2b2d42);
+      color: white;
+      padding: 15px 35px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(82,174,227,0.3);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(82,174,227,0.4);
+    }
+
+    .contact-info {
+      padding: 40px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border: 1px solid rgba(82,174,227,0.1);
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .contact-item:hover {
+      background: rgba(82,174,227,0.05);
+      transform: translateX(5px);
+    }
+
+    .contact-icon {
+      font-size: 2em;
+      color: #52aee3;
+      margin-right: 20px;
+      text-shadow: 2px 2px 4px rgba(82,174,227,0.2);
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Footer */
+    .site-footer {
+      text-align: center;
+      background: linear-gradient(135deg, #385482, #2b2d42);
+      color: #fff;
+      padding: 25px 0;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      font-size: 14px;
+      z-index: 1000;
+      box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Scroll to top button */
+    .scroll-top {
+      position: fixed;
+      bottom: 80px;
+      right: 30px;
+      background: linear-gradient(135deg, #52aee3, #2b2d42);
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(82,174,227,0.3);
+      z-index: 999;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+    }
+
+    .scroll-top:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(82,174,227,0.4);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Exploring OWASP TOP 10 WEB SECURITY - IE2062</h1>
+  </header>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <section id="home">
+    <div class="intro">
+      <p>
+        Our objective is to raise awareness of the critical role cybersecurity plays in modern web-based applications and to present practical methods for reducing security risks.
+      </p>
+    </div>
+
+    <div class="grid-container">
+      <div class="vuln-box" onclick="showDetails('Broken Access Control', 'Broken Access Control occurs when applications fail to enforce proper restrictions on what authenticated users are allowed to do. This vulnerability allows attackers to gain unauthorized access to resources or perform actions outside their intended permissions. Consequences can include viewing or modifying other users data, escalating privileges, or accessing admin functions. Common examples include insecure direct object references (IDOR), forced browsing, and missing or ineffective authorization checks.')">
+        <span>1. Broken Access Control</span>
+      </div>
+      <div class="vuln-box" onclick="showDetails('Cryptographic Failures', 'Cryptographic Failures refer to the improper implementation or absence of encryption, leading to exposure of sensitive data such as passwords, credit card numbers, or personal information. These failures can occur due to weak or outdated algorithms, insecure key management, or transmitting data in plaintext. As a result, attackers may intercept, read, or manipulate confidential information. Common examples include using HTTP instead of HTTPS, hardcoded or reused encryption keys, and failure to encrypt sensitive data at rest or in transit.')">
+        <span>2. Cryptographic Failures</span>
+      </div>
+      <div class="vuln-box" onclick="showDetails('Injection', 'Injection involves sending malicious data to an interpreter to execute unintended commands or access data. This can lead to data loss, corruption, or disclosure to unauthorized parties. Common examples include SQL injection, NoSQL injection, and command injection')">
+        <span>3. Injection</span>
+      </div>
+      <div class="vuln-box" onclick="showDetails('Insecure Design', 'Insecure Design refers to flaws in the architecture and design of an application that leave it vulnerable to abuse or misuse. Unlike implementation bugs, these issues stem from missing or ineffective security controls, insecure default behaviors, or a failure to anticipate potential threats. Consequences can include unauthorized access, privilege escalation, or data exposure. Common examples include lack of threat modeling, insecure business logic, and improper segregation of duties.')">
+        <span>4. Insecure Design</span>
+      </div>
+      <div class="vuln-box" onclick="showDetails('Security Misconfiguration', '**Security Misconfiguration** occurs when security settings are incomplete, insecure, or left at their default values, making systems vulnerable to attack. This can include misconfigured HTTP headers, overly verbose error messages, or unnecessary services enabled. Attackers can exploit these weaknesses to gain unauthorized access, retrieve sensitive information, or compromise the system. Common examples include default admin accounts, exposed configuration files, and open cloud storage buckets.')">
+        <span>5. Security Misconfiguration</span>
+      </div>
+      <div class="vuln-box" onclick="showDetails('Vulnerable and Outdated Components', 'Vulnerable and Outdated Components refers to the use of software libraries, frameworks, or other system components that contain known security flaws or are no longer supported. Attackers exploit these outdated elements to gain unauthorized access, execute malicious code, or compromise the integrity of the application.')">
+        <span>6. Vulnerable and Outdated Components</span>
+      </div>
+      <div class="vuln-box" onclick="showDetails('Identification and Authentication Failures', 'Identification and Authentication Failures occur when applications do not properly verify user identities or manage authentication mechanisms securely. This can allow attackers to compromise passwords, keys, or session tokens, or exploit implementation flaws to assume other users identities.')">
+        <span>7. Identification and Authentication Failures</span>
+      </div>
+      <div class="vuln-box" onclick="showDetails('Software and Data Integrity Failures', 'Software and Data Integrity Failures occur when applications rely on insecure software, libraries, plugins, or repositories without verifying their integrity. Attackers can exploit these weaknesses by injecting malicious updates or compromising the software supply chain. .')">
+        <span>8. Software and Data Integrity Failures</span>
+      </div>
+      <div class="vuln-box" onclick="showDetails('Security Logging and Monitoring Failures', 'Security Logging and Monitoring Failures involve the lack of proper logging, detection, and alerting mechanisms for suspicious activities or security events.')">
+        <span>9. Security Logging and Monitoring Failures</span>
+      </div>
+      <div class="vuln-box" onclick="showDetails('Server-Side Request Forgery', 'Server-Side Request Forgery (SSRF) occurs when an attacker tricks a server into making unauthorized requests to internal or external resources on their behalf.')">
+        <span>10. Server-Side Request Forgery</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <h2 class="section-title">About Us</h2>
+    <div class="about-content">
+      <div>
+        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Cybersecurity" class="about-image">
+      </div>
+      <div class="about-text">
+        <p>We are a team of cybersecurity professionals dedicated to raising awareness about web application security. Our mission is to educate developers, businesses, and individuals about the importance of secure coding practices and the OWASP Top 10 vulnerabilities.</p>
+        <p>With years of experience in the field, we provide comprehensive security solutions and training to help organizations protect their web applications from potential threats and vulnerabilities.</p>
+        <p>Our team consists of certified security experts who stay up-to-date with the latest security trends and best practices to ensure we provide the most relevant and effective security solutions.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <h2 class="section-title">Our Services</h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">🔒</div>
+        <h3>Security Assessment</h3>
+        <p>Comprehensive security audits of your web applications to identify vulnerabilities and provide actionable recommendations.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🛡️</div>
+        <h3>Penetration Testing</h3>
+        <p>Simulated cyber attacks to evaluate the security of your systems and identify potential weaknesses.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📚</div>
+        <h3>Security Training</h3>
+        <p>Customized training programs for your development team to enhance their security awareness and skills.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🔍</div>
+        <h3>Code Review</h3>
+        <p>Thorough review of your application's source code to identify security vulnerabilities and suggest improvements.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2 class="section-title">Contact Us</h2>
+    <div class="contact-container">
+      <div class="contact-form">
+        <form id="contactForm">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" required></textarea>
+          </div>
+          <button type="submit" class="submit-btn">Send Message</button>
+        </form>
+      </div>
+      <div class="contact-info">
+        <div class="contact-item">
+          <span class="contact-icon">📍</span>
+          <div>
+            <h3>Address</h3>
+            <p>123 Security Street, Cyber City</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">📧</span>
+          <div>
+            <h3>Email</h3>
+            <p>info@owaspsecurity.com</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">📞</span>
+          <div>
+            <h3>Phone</h3>
+            <p>+1 (555) 123-4567</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal Popup for Vulnerability Details -->
+  <div id="popupModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <div class="vulnerability-details">
+        <p id="modalText"></p>
+        <button class="hint-button" onclick="showAnswer()">Show Hint</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Popup for Answer -->
+  <div id="answerModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeAnswerModal()">&times;</span>
+      <h2 id="answerTitle"></h2>
+      <div class="answer-content">
+        <p id="answerText"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-top" onclick="scrollToTop()">↑</div>
+
+  <footer class="site-footer">
+    ©Design By Yevidu Yashmika || IT23238794 DISSANAYAKE Y Y || All rights reserved
+  </footer>
+
+  <script>
+    function showDetails(title, message) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalText').textContent = message;
+      document.getElementById('popupModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('popupModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    function showAnswer() {
+      const currentTitle = document.getElementById('modalTitle').textContent;
+      document.getElementById('answerTitle').textContent = `Solution for ${currentTitle}`;
+      
+      // Dummy answers for each vulnerability
+      const answers = {
+        'Broken Access Control': 'Answer: Insecure Direct Object References',
+        'Cryptographic Failures': 'Answer: HTTPS',
+        'Injection': 'Answer: SQL injection',
+        'Insecure Design': 'Answer: Insecure Design',
+        'Security Misconfiguration': 'Answer: admin/admin',
+        'Vulnerable and Outdated Components': 'Answer: Libraries or Frameworks',
+        'Identification and Authentication Failures': 'Answer: MFA',
+        'Software and Data Integrity Failures': 'Answer: Digital Signature',
+        'Security Logging and Monitoring Failures': 'Answer: logging and monitoring',
+        'Server-Side Request Forgery': 'Answer: Server-Side Request Forgery'
+      };
+
+      document.getElementById('answerText').textContent = answers[currentTitle] || 'No solution available for this vulnerability.';
+      document.getElementById('answerModal').style.display = 'block';
+    }
+
+    function closeAnswerModal() {
+      document.getElementById('answerModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('popupModal');
+      const answerModal = document.getElementById('answerModal');
+      if (event.target === modal) {
+        closeModal();
+      }
+      if (event.target === answerModal) {
+        closeAnswerModal();
+      }
+    }
+
+    // Close modals with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeModal();
+        closeAnswerModal();
+      }
+    });
+
+    // Form submission handling
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Thank you for your message! We will get back to you soon.');
+      this.reset();
+    });
+
+    // Scroll to top button
+    const scrollTopBtn = document.querySelector('.scroll-top');
+    
+    window.addEventListener('scroll', function() {
+      if (window.pageYOffset > 300) {
+        scrollTopBtn.classList.add('visible');
+      } else {
+        scrollTopBtn.classList.remove('visible');
+      }
+    });
+
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    // Animate sections on scroll
+    const sections = document.querySelectorAll('section');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
+
+    sections.forEach(section => {
+      observer.observe(section);
+    });
+  </script>
+</body>
+</html>
+
+<footer class="site-footer">
+    ©Design By Yevidu Yashmika || IT23238794 DISSANAYAKE Y Y || All rights reserved
+  </footer>
+  
